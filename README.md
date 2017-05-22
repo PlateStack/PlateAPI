@@ -9,7 +9,7 @@ Check the [changelog](CHANGELOG.md) file to be aware of notable changes.
 Creating a Plugin
 -----------------
 To create a plugin you must add the PlateAPI JAR to your project, that can be done manually by
-[compiling the code](#compilation) and configuring your IDE or automatically using gradle or maven.
+[compiling the code](#compilation) and configuring your IDE or automatically using [gradle](#using-gradle) or [maven](#using-maven).
 
 If you are using Kotlin you must use the version kotlin-gradle-plugin version then PlateAPI.
 
