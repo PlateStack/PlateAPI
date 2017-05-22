@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-group 'br.com.gamemods'
+group 'org.platestack'
 version = "0.1.0-SNAPSHOT"
 
 buildscript {
