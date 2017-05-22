@@ -22,6 +22,7 @@ import com.github.salomonbrys.kotson.jsonObject
 import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
 import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 interface InternalAccessor {
     fun createShowItemJSON(stack: ItemStack): JsonObject {
@@ -38,5 +39,5 @@ interface InternalAccessor {
         return json
     }
 
-    fun createLogger(plugin: PlatePlugin): Logger
+    fun createLogger(plugin: PlatePlugin): Logger = LoggerFactory.getLogger(plugin.javaClass)
 }

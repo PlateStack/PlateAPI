@@ -17,6 +17,7 @@
 package br.com.gamemods.platestack.api.server
 
 import br.com.gamemods.platestack.api.message.Translator
+import br.com.gamemods.platestack.api.plugin.PlateNamespace
 import br.com.gamemods.platestack.api.plugin.Plugin
 import br.com.gamemods.platestack.api.plugin.PluginNamespace
 import br.com.gamemods.platestack.api.plugin.version.Version
@@ -53,7 +54,11 @@ interface PlateServer {
     /**
      * Gets a registered namespace by its value
      */
-    fun getNamespace(id: String): PluginNamespace?
+    fun getNamespace(id: String): PluginNamespace? = when(id) {
+        "plate" -> PlateNamespace
+        "platform" -> platform
+        else -> null
+    }
 
     /**
      * Gets a plugin by its value and its namespace value

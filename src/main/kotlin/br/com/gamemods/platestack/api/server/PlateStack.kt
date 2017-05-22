@@ -13,46 +13,43 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+@file:JvmName("PlateStack")
 
 package br.com.gamemods.platestack.api.server
 
+import kotlin.reflect.KProperty
+
 /**
- * Core object which connects the API implementation to the plugins
+ * An identification pattern which must be followed in all PlateStack's API which requires ID registration.
+ *
+ * Additional requirements may be applied, such as minimum and maximum ID length.
+ *
+ * Platform and Minecraft IDs do not follow this rule.
+ *
+ * This pattern enforces that IDs must:
+ * * Be completely lower-cased
+ * * Begins with a letter
+ * * Ends with a letter
+ * * Have only English unaccented letters
+ * * Have no spaces (underscore is allowed as long as it doesn't repeat)
  */
-object PlateStack: PlateServer by PlateStack.internalServer {
-    /**
-     * An identification pattern which must be followed in all PlateStack's API which requires ID registration.
-     *
-     * Additional requirements may be applied, such as minimum and maximum ID length.
-     *
-     * Platform and Minecraft IDs do not follow this rule.
-     *
-     * This pattern enforces that IDs must:
-     * * Be completely lower-cased
-     * * Begins with a letter
-     * * Ends with a letter
-     * * Have only English unaccented letters
-     * * Have no spaces (underscore is allowed as long as it doesn't repeat)
-     */
-    @JvmField val ID_VALIDATOR = Regex("^[a-z](_[a-z]+)+$")
+@JvmField val ID_VALIDATOR = Regex("^[a-z](_[a-z]+)+$")
 
-    /**
-     * The current implementation, it's private to protect it from modification after the first value is set.
-     */
-    private lateinit var internalServer: PlateServer
+var PlateStack by UniqueModification<PlateServer>()
+    @JvmName("getServer") get
+    @JvmName("setServer") set
 
-    /**
-     * The server implementation object. Cannot be modified after a value is set.
-     */
-    @JvmStatic var server = internalServer ; set(value) {
-        val internal: PlateServer
-        try {
-            internal = internalServer
-        } catch (e: IllegalStateException) {
-            internalServer = value
-            return
-        }
+class UniqueModification<V: Any> {
 
-        error("PlateStack is already being driven by $internal")
+    private var field: V? = null
+
+    operator fun getValue(thisRef: Nothing?, property: KProperty<*>): V {
+        return field ?: throw UninitializedPropertyAccessException("No value has been set to ${property.name} yet")
+    }
+    operator fun setValue(thisRef: Nothing?, property: KProperty<*>, value: V) {
+        if(field != null)
+            error("The value can be modified only one time.")
+
+        this.field = value
     }
 }

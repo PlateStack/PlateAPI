@@ -18,6 +18,7 @@ package br.com.gamemods.platestack.api.plugin.version
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.immutableListOf
+import kotlinx.collections.immutable.toImmutableList
 
 /**
  * A version following the [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html) rules.
@@ -42,7 +43,7 @@ data class Version(
         val major: Int, val minor: Int = 0, val patch: Int = 0,
         val label: ImmutableList<String> = immutableListOf(), val metadata: String = "",
         val raw: String = "",
-        val stable: Boolean = label.isEmpty() || major > 0
+        val stable: Boolean = label.isEmpty() && major > 0
 ): Comparable<Version> {
 
     /**
@@ -162,6 +163,11 @@ data class Version(
         private val STRING_LABEL = Regex("^[0-9A-Za-z-]+$")
         private val VALID_METADATA = Regex("^[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*$")
 
+        private val FIRST_NUMBERS = Regex("^([0-9]+)(?:\\.([0-9]+))*")
+        private val LABEL_PART = Regex("^-?([^0-9a-zA-Z._-]+)?\\+?(.*)?$")
+        private val MULTI_DOT = Regex("\\.{2,}")
+        private val FIX_ZERO = Regex("^0+")
+
         /**
          * Checks if a string only contains digits
          */
@@ -182,8 +188,42 @@ data class Version(
          * Parses a string into the closest SemVersion definition as possible
          */
         @JvmStatic fun parse(version: String): Version {
-            //TODO Implement
-            TODO()
+            var carret = 0
+            val numbers = FIRST_NUMBERS.find(version)?.value?.let {
+                carret += it.length
+                it.split(".")
+            } ?: emptyList()
+
+            val maj = numbers.getOrNull(0)?.toInt() ?: 0
+            val min = numbers.getOrNull(1)?.toInt() ?: 0
+            val pat = numbers.getOrNull(2)?.toInt() ?: 0
+
+            val label = mutableListOf<String>()
+            numbers.listIterator(3).forEach { label += it }
+
+            var unstable = numbers.isEmpty()
+            val build = LABEL_PART.find(version.substring(carret))?.groupValues?.let {
+                val definedLabel = it[1]
+                if(definedLabel.isNotBlank()) {
+                    unstable = true
+                    val fixedLabel = definedLabel.replace('_', '-').replace(MULTI_DOT, ".")
+                    label += fixedLabel.split(".")
+                }
+                it[2]
+            } ?: ""
+
+            val iter = label.listIterator()
+            for (item in iter) {
+                if(item.isInt() && INVALID_NUMERIC_LABEL.matches(item)) {
+                    val replaced = item.replace(FIRST_NUMBERS, "")
+                    if(replaced.isEmpty())
+                        iter.set("0")
+                    else
+                        iter.set(replaced)
+                }
+            }
+
+            return Version(maj, min, pat, label.toImmutableList(), build, version, !unstable && maj > 0)
         }
     }
 }
