@@ -42,7 +42,7 @@ import org.platestack.api.server.PlateStack
  * relations to platform plugins or mods and to platform and Minecraft versions.
  */
 @Retention @Target(AnnotationTarget.CLASS) @MustBeDocumented
-annotation class Plate(val id: String, val name: String, val version: Version, vararg val relations: Relation)
+annotation class Plate(val id: String, val name: String, val version: Version, vararg val relations: Relation = emptyArray())
 
 /**
  * A version following the [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html) rules.
