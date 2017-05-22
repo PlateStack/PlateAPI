@@ -80,3 +80,10 @@ task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
     outputFormat = "javadoc"
     outputDirectory = "$buildDir/javadoc"
 }
+
+task jarSources(type:Jar){
+    from sourceSets.main.allSource
+    classifier = 'source'
+}
+
+build.finalizedBy jarSources
