@@ -23,8 +23,8 @@ Example Plugins
 
 ### Kotlin
 ```kotlin
-import br.com.gamemods.platestack.api.plugin.PlatePlugin
-import br.com.gamemods.platestack.api.plugin.annotation.*
+import org.platestack.api.plugin.PlatePlugin
+import org.platestack.api.plugin.annotation.*
 
 /**
  * Declare this as a plate plugin and mark it dependent to "my_java_plugin" accepting any version starting from 0.1.0
@@ -44,8 +44,8 @@ object MyKotlinPlugin: PlatePlugin() {
 
 ### Java
 ```java
-import br.com.gamemods.platestack.api.plugin.PlatePlugin;
-import br.com.gamemods.platestack.api.plugin.annotation.*;
+import org.platestack.api.plugin.PlatePlugin;
+import org.platestack.api.plugin.annotation.*;
 
 /**
  * Declare this as a plate plugin and mark it dependent to "my_kotlin_plugin" accepting any version starting from 0.1.0
