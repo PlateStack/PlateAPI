@@ -93,4 +93,4 @@ task jarSources(type:Jar){
     classifier = 'sources'
 }
 
-build.finalizedBy jarSources
+artifacts { archives jarSources }
