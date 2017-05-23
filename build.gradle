@@ -62,7 +62,6 @@ dependencies {
 }
 
 jar {
-    from sourceSets.main.allSource
     from {
         ["CHANGELOG.md", "LICENSE.txt"]
     }
@@ -91,7 +90,7 @@ task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
 
 task jarSources(type:Jar){
     from sourceSets.main.allSource
-    classifier = 'source'
+    classifier = 'sources'
 }
 
 build.finalizedBy jarSources
