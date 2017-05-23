@@ -26,6 +26,7 @@ buildscript {
         jcenter()
     }
     dependencies {
+        //noinspection DifferentKotlinGradleVersion
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
         classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0-M4'
@@ -49,7 +50,7 @@ dependencies {
 
     compile 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.1'
     compile 'com.github.salomonbrys.kotson:kotson:2.5.0'
-    compile 'org.slf4j:slf4j-simple:1.7.25'
+    compile 'org.slf4j:slf4j-api:1.7.25'
     compile 'com.google.inject:guice:4.1.0'
 
     compile 'org.ow2.asm:asm:5.2'
