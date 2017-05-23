@@ -61,6 +61,13 @@ dependencies {
     testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.1.1'
 }
 
+jar {
+    from sourceSets.main.allSource
+    from {
+        ["CHANGELOG.md", "LICENSE.txt"]
+    }
+}
+
 junitPlatform {
     filters {
         engines {
