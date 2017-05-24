@@ -16,6 +16,7 @@
 
 package org.platestack.api.plugin.annotation
 
+import org.platestack.api.plugin.RelationType
 import org.platestack.api.server.PlateStack
 
 /**
@@ -102,7 +103,7 @@ annotation class Relation(val type: RelationType, val id: ID, vararg val version
 @Target @MustBeDocumented
 annotation class VersionRange(
         val min: Version = Version(0), val max: Version = Version(0, label = "0"),
-        vararg val exclusions: Version = emptyArray(),
+        vararg val exclusions: VersionRange = emptyArray(),
         val unstable: Boolean = true, val caseSensitive: Boolean = false,
         val dynamic: String = ""
 )
@@ -114,46 +115,3 @@ annotation class VersionRange(
  */
 annotation class ID(val value: String, val namespace: String = "plate")
 
-/**
- * Defines how a plugin is related to an other
- */
-enum class RelationType {
-    /**
-     * The declared plugin is required and must be loaded before this plugin.
-     *
-     * The declared plugin's event handlers will also take priority when it has the same priority as this plugin's event handlers.
-     */
-    REQUIRED_BEFORE,
-
-    /**
-     * The declared plugin is required but it must be loaded after this plugin.
-     *
-     * The declared plugin's event handlers will also have lower priority when it has the same priority as this plugin's event handlers.
-     */
-    REQUIRED_AFTER,
-
-    /**
-     * The declared plugin may be present or not but must be loaded before this plugin when it is present.
-     *
-     * The declared plugin's event handlers will also take priority when it has the same priority as this plugin's event handlers.
-     */
-    OPTIONAL_BEFORE,
-
-    /**
-     * The declared plugin may be present or not but must be loaded after this plugin when it is present.
-     *
-     * The declared plugin's event handlers will also have lower priority when it has the same priority as this plugin's event handlers.
-     */
-    OPTIONAL_AFTER,
-
-    /**
-     * This plugin will refuse to work when the declared plugin is present and an informative message will be displayed.
-     */
-    INCOMPATIBLE,
-
-    /**
-     * The plugin will refuse to work when the declared plugin is present in an other file container
-     * and an informative message will be displayed.
-     */
-    INCLUDED
-}

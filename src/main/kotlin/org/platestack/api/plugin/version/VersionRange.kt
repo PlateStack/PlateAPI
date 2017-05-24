@@ -18,6 +18,7 @@ package org.platestack.api.plugin.version
 
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.immutableHashSetOf
+import kotlinx.collections.immutable.toImmutableSet
 
 /**
  * A selection of ranges which supports exclusions.
@@ -35,6 +36,28 @@ data class VersionRange(val min: Version?, val max: Version?, val exclusions: Im
     init {
         if(min != null && max != null) {
             require(min <= max) { "$min must be less or equals to $max"}
+        }
+    }
+
+    companion object {
+        @JvmStatic fun parse(range: String): Pair<Version?, Version?> {
+            TODO() // TODO Implement
+        }
+
+        @JvmStatic fun from(annotation: org.platestack.api.plugin.annotation.VersionRange): VersionRange {
+            val min: Version?
+            val max: Version?
+            if(annotation.dynamic.isNotBlank()) {
+                val pair = parse(annotation.dynamic)
+                min = pair.first
+                max = pair.second
+            }
+            else {
+                min = Version.from(annotation.min).takeUnless { it == Version(0) }
+                max = Version.from(annotation.max).takeUnless { min != null && it < min }
+            }
+
+            return VersionRange(min, max, annotation.exclusions.map { from(it) }.toImmutableSet(), annotation.unstable, annotation.caseSensitive)
         }
     }
 
