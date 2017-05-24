@@ -18,14 +18,26 @@
 
 package org.platestack.api.json
 
+import com.github.salomonbrys.kotson.addProperty
 import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import org.platestack.api.message.Message
 import org.platestack.api.message.Text
 
 fun JsonElement.getAsMessage() = (this as? JsonPlate ?: throw UnsupportedOperationException(javaClass.simpleName)).message
 fun JsonElement.getAsText() = (this as? JsonPlate ?: throw UnsupportedOperationException(javaClass.simpleName)).text
+
 val JsonElement.message get() = getAsMessage()
+val JsonElement?.nullMessage get() = this?.takeIf { !isJsonNull }?.message
+
 val JsonElement.text get() = getAsText()
+val JsonElement?.nullText get() = this?.takeIf { !isJsonNull }?.text
+
+fun JsonObject.addProperty(property: String, value: Message) = addProperty(property, JsonMessage(value))
+fun JsonObject.addProperty(property: String, value: Text) = addProperty(property, JsonText(value))
+
+fun JsonObject.addPropertyIfNotNull(property: String, value: Message?) = value?.let { addProperty(property, it) }
+fun JsonObject.addPropertyIfNotNull(property: String, value: Text?) = value?.let { addProperty(property, it) }
 
 // TODO Implement
 interface JsonPlate {
