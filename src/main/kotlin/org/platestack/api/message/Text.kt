@@ -29,12 +29,14 @@ import java.util.*
  * This model is based on [this definition](https://minecraft.gamepedia.com/Commands#Raw_JSON_text)
  * @property style The style that will be applied to this text and all children. All null style properties will inherit the parent's style.
  * @property hoverEvent What happens when the player passes the mouse pointer hover this text. The parent's event is inherited when this property is null.
+ * @property insertion When the text is shift-clicked by a player, this string will be inserted in their chat input. It will not overwrite any existing text the player was writing.
  * @property clickEvent What happens when the player clicks this text. The parent's event is inherited when this property is null.
  */
 sealed class Text(
         val style: Style,
         val hoverEvent: HoverEvent?,
         val clickEvent: ClickEvent?,
+        val insertion: String?,
         vararg extra: Text
 ): Serializable {
     /**
@@ -57,7 +59,14 @@ sealed class Text(
     /**
      * Translates and converts this text to a JSON string using the current server implementation
      */
+    @Deprecated("The name causes confusion with json-extensions.kt")
     fun toJson(language: Language) = PlateStack.translator.toJson(this, language)
+
+    /**
+     * Converts this text to a JSON object with the same structure as the tellraw command
+     */
+    @Deprecated("The name is shadowing json-extensions.kt")
+    fun toJson() = PlateStack.internal.toJson(this)
 
     /**
      * Compares if this text matches all style, event, extra messages and information with the given object
@@ -100,21 +109,31 @@ sealed class Text(
      * @param style See [Text.style]
      * @param hoverEvent See [Text.hoverEvent]
      * @param clickEvent See [Text.clickEvent]
+     * @param insertion See [Text.insertion]
      * @param extra See [Text.extra]
      */
     class Compound(
             style: Style,
             hoverEvent: HoverEvent?,
             clickEvent: ClickEvent?,
+            insertion: String? = null,
             vararg extra: Text
-    ) : Text(style, hoverEvent, clickEvent, *extra) {
+    ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
 
         /**
          * Creates a compound without events
-         * @param style [Text.style]
-         * @param extra [Text.extra]
+         * @param style See [Text.style]
+         * @param insertion See [Text.insertion]
+         * @param extra See [Text.extra]
          */
-        constructor(style: Style, vararg extra: Text) : this(style, null, null, *extra)
+        constructor(style: Style, insertion: String?, vararg extra: Text) : this(style, null, null, insertion, *extra)
+
+        /**
+         * Creates a compound without events
+         * @param style See [Text.style]
+         * @param extra See [Text.extra]
+         */
+        constructor(style: Style, vararg extra: Text) : this(style, null, null, "", *extra)
     }
 
     /**
@@ -126,14 +145,16 @@ sealed class Text(
      * @param text See [text]
      * @param hoverEvent See [Text.hoverEvent]
      * @param clickEvent See [Text.clickEvent]
+     * @param insertion See [Text.insertion]
      * @param extra See [Text.extra]
      */
     class RawText @JvmOverloads constructor(
             val text: String, style: Style = Style.EMPTY,
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
+            insertion: String? = null,
             vararg extra: Text
-    ) : Text(style, hoverEvent, clickEvent, *extra) {
+    ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -168,6 +189,8 @@ sealed class Text(
      * @param style See [Text.style]
      * @param hoverEvent See [Text.hoverEvent]
      * @param clickEvent See [Text.clickEvent]
+     * @param insertion See [Text.insertion]
+     * @param with A list of chat component arguments and/or string arguments to be used by translate
      * @param extra See [Text.extra]
      */
     class Translation @JvmOverloads constructor(
@@ -175,8 +198,10 @@ sealed class Text(
             style: Style = Style.EMPTY,
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
+            insertion: String? = null,
+            val with: List<Text> = emptyList(),
             vararg extra: Text
-    ) : Text(style, hoverEvent, clickEvent, *extra) {
+    ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other?.javaClass != javaClass) return false
@@ -214,6 +239,7 @@ sealed class Text(
      * @param style See [Text.style]
      * @param hoverEvent See [Text.hoverEvent]
      * @param clickEvent See [Text.clickEvent]
+     * @param insertion See [Text.insertion]
      * @param extra See [Text.extra]
      */
     class KeyBinding @JvmOverloads constructor(
@@ -221,8 +247,9 @@ sealed class Text(
             style: Style = Style.EMPTY,
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
+            insertion: String? = null,
             vararg extra: Text
-    ) : Text(style, hoverEvent, clickEvent, *extra) {
+    ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other?.javaClass != javaClass) return false
@@ -272,6 +299,7 @@ sealed class Text(
      * @param hoverEvent See [Text.hoverEvent]
      * @param clickEvent See [Text.clickEvent]
      * @param value See [value]
+     * @param insertion See [Text.insertion]
      * @param extra See [Text.extra]
      */
     class Score @JvmOverloads constructor(
@@ -281,8 +309,9 @@ sealed class Text(
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
             val value: Message? = null,
+            insertion: String? = null,
             vararg extra: Text
-    ) : Text(style, hoverEvent, clickEvent, *extra) {
+    ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
 
         /**
          * Creates a score component using untranslatable strings as parameters.
@@ -292,6 +321,7 @@ sealed class Text(
          * @param hoverEvent See [Text.hoverEvent]
          * @param clickEvent See [Text.clickEvent]
          * @param value See [value]
+         * @param insertion See [Text.insertion]
          * @param extra See [Text.extra]
          */
         @JvmOverloads constructor(
@@ -301,8 +331,9 @@ sealed class Text(
                 hoverEvent: HoverEvent? = null,
                 clickEvent: ClickEvent? = null,
                 value: String? = null,
+                insertion: String? = null,
                 vararg extra: Text
-        ) : this(Message(name), Message(objective), style, hoverEvent, clickEvent, value?.let { Message(it) }, *extra)
+        ) : this(Message(name), Message(objective), style, hoverEvent, clickEvent, value?.let { Message(it) }, insertion, *extra)
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -349,6 +380,7 @@ sealed class Text(
      * @param style See [Text.style]
      * @param hoverEvent See [Text.hoverEvent]
      * @param clickEvent See [Text.clickEvent]
+     * @param insertion See [Text.insertion]
      * @param extra See [Text.extra]
      */
     class Selector @JvmOverloads constructor(
@@ -356,8 +388,9 @@ sealed class Text(
             style: Style = Style.EMPTY,
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
+            insertion: String? = null,
             vararg extra: Text
-    ) : Text(style, hoverEvent, clickEvent, *extra) {
+    ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
 
         /**
          * Creates a selector component using an untranslatable message
@@ -371,8 +404,9 @@ sealed class Text(
                                   style: Style = Style.EMPTY,
                                   hoverEvent: HoverEvent? = null,
                                   clickEvent: ClickEvent? = null,
+                                  insertion: String? = null,
                                   vararg extra: Text
-        ) : this(Message(selector), style, hoverEvent, clickEvent, *extra)
+        ) : this(Message(selector), style, hoverEvent, clickEvent, insertion, *extra)
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -402,8 +436,9 @@ sealed class Text(
             style: Style = Style.EMPTY,
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
+            insertion: String? = null,
             vararg extra: Text
-    ): Text(style, hoverEvent, clickEvent, *extra) {
+    ): Text(style, hoverEvent, clickEvent, insertion, *extra) {
 
         @JvmOverloads constructor(
                 sentence: Sentence,
@@ -411,15 +446,17 @@ sealed class Text(
                 parameters: Map<String, Serializable> = emptyMap(),
                 hoverEvent: HoverEvent? = null,
                 clickEvent: ClickEvent? = null,
+                insertion: String? = null,
                 vararg extra: Text
-        ): this(Message(sentence, parameters), style, hoverEvent, clickEvent, *extra)
+        ): this(Message(sentence, parameters), style, hoverEvent, clickEvent, insertion, *extra)
 
         @JvmOverloads constructor(
                 rawText: String,
                 style: Style = Style.EMPTY,
                 hoverEvent: HoverEvent? = null,
                 clickEvent: ClickEvent? = null,
+                insertion: String? = null,
                 vararg extra: Text
-        ): this(Message(rawText), style, hoverEvent, clickEvent, *extra)
+        ): this(Message(rawText), style, hoverEvent, clickEvent, insertion, *extra)
     }
 }

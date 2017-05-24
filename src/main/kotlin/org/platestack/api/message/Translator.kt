@@ -16,6 +16,8 @@
 
 package org.platestack.api.message
 
+import com.google.gson.JsonElement
+
 /**
  * An object which translates and format messages that will be visible to players or humans
  */
@@ -28,4 +30,12 @@ interface Translator {
      * @return The translated JSON string appropriated to the current Minecraft's version
      */
     fun toJson(text: Text, language: Language): String
+
+    /**
+     * Converts all translatable elements into static translated strings
+     * @param jsonElement The element to be translated
+     * @param language The target language
+     * @return A new translated object
+     */
+    fun translate(jsonElement: JsonElement, language: Language): JsonElement
 }

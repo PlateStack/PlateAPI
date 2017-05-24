@@ -22,30 +22,31 @@ package org.platestack.api.message
  * As defined in [Minecraft's wiki](https://minecraft.gamepedia.com/Formatting_codes#Formatting_codes).
  *
  * Note: The "reset" format is being considered a color: [ChatColor.RESET].
+ * @property id The ID used to apply this format on JSON messages
  * @property code The character that identifies this color
  * @property title The translatable name
  * @property style A style which only sets this color. May be used for memory optimizations.
  */
-enum class ChatFormat(val code: Char, val style: Style, val title: Sentence) {
+enum class ChatFormat(val id: String, val code: Char, val style: Style, val title: Sentence) {
     /** Replaces each char with random chars with the same size in every rendering tick **/
-    OBFUSCATED('k', Style(obfuscated = true), "Obfuscated"),
+    OBFUSCATED("obfuscated", 'k', Style(obfuscated = true), "Obfuscated"),
 
     /** Makes all characters larger and stronger **/
-    BOLD('l', Style(bold = true), "Bold"),
+    BOLD("bold", 'l', Style(bold = true), "Bold"),
 
     /** Draws a line cutting the text horizontally **/
-    STRIKE('m', Style(strike = true), Sentence("chatformat", "strike", "Strike Through")),
+    STRIKE("strikethrough", 'm', Style(strike = true), Sentence("chatformat", "strike", "Strike Through")),
 
     /** Draws a line under the text **/
-    UNDERLINE('n', Style(underline = true), "Underline"),
+    UNDERLINE("underlined", 'n', Style(underline = true), "Underline"),
 
     /** Draws the text cursively **/
-    ITALIC('o', Style(italic = true), "Italic")
+    ITALIC("italic", 'o', Style(italic = true), "Italic")
     ;
 
     @Suppress("unused")
-    constructor(code: Char, style: Style, name: String):
-            this(code, style, Sentence("chatformat", name.toLowerCase(), name))
+    constructor(id: String, code: Char, style: Style, name: String):
+            this(id, code, style, Sentence("chatformat", name.toLowerCase(), name))
 
     private val str = "\u00A7$code"
 

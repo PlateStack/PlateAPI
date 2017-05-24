@@ -18,7 +18,7 @@
 
 package org.platestack.api.json
 
-import com.github.salomonbrys.kotson.addProperty
+import com.github.salomonbrys.kotson.*
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.platestack.api.message.Message
@@ -39,8 +39,30 @@ fun JsonObject.addProperty(property: String, value: Text) = addProperty(property
 fun JsonObject.addPropertyIfNotNull(property: String, value: Message?) = value?.let { addProperty(property, it) }
 fun JsonObject.addPropertyIfNotNull(property: String, value: Text?) = value?.let { addProperty(property, it) }
 
+fun Message.toJson() = JsonMessage(this)
+//TODO Fix shadowing
+fun Text.toJson() = JsonText(this)
+
+operator fun JsonElement.set(key: String, value: Any?) = obj.add(key, value.toJsonElement())
+operator fun JsonElement.set(key: Int, value: Any?) = array.set(key, value.toJsonElement())
+
+internal fun Any?.toJsonElement(): JsonElement {
+    if (this == null)
+        return jsonNull
+
+    return when (this) {
+        is Message -> toJson()
+        is Text -> toJson()
+        is Number -> toJson()
+        is Char -> toJson()
+        is Boolean -> toJson()
+        else -> throw IllegalArgumentException("$this cannot be converted to JSON")
+    }
+}
+
 // TODO Implement
 interface JsonPlate {
     val message: Message get() = TODO()
     val text: Text get() = TODO()
+    val element: JsonElement get() = TODO()
 }
