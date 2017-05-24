@@ -16,7 +16,9 @@
 
 package org.platestack.api.plugin
 
+import com.google.gson.JsonObject
 import org.objectweb.asm.*
+import org.platestack.api.message.Text
 import org.platestack.api.message.Translator
 import org.platestack.api.plugin.annotation.Plate
 import org.platestack.api.plugin.version.Version
@@ -179,7 +181,11 @@ fun main(args: Array<String>) {
         override val platformName = "test"
         override lateinit var translator: Translator
         override val platform = PlatformNamespace("test" to Version(0,1,0,"SNAPSHOT"))
-        override val internal = object : InternalAccessor {}
+        override val internal = object : InternalAccessor {
+            override fun toJson(text: Text): JsonObject {
+                TODO("not implemented")
+            }
+        }
     }
 
     PlateNamespace.load(File("D:\\_InteliJ\\PlateStack\\ExamplePlugin\\build\\libs\\ExamplePlugin-0.1.0-SNAPSHOT.jar").toURI().toURL())
