@@ -27,4 +27,7 @@ data class Relation(val type: RelationType, val id: String, val namespace: Strin
         @JvmStatic fun from(annotation: org.platestack.api.plugin.annotation.Relation) =
                 Relation(annotation.type, annotation.id.value, annotation.id.namespace, annotation.versions.map { VersionRange.from(it) })
     }
+
+    operator fun contains(metadata: PlateMetadata)
+            = namespace == "plate" && id == metadata.id && versions.any { metadata.version in it }
 }

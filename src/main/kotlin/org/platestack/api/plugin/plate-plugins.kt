@@ -52,6 +52,8 @@ abstract class PlatePlugin: Plugin {
         "Attempted to create a new PlatePlugin instance in a invalid state!"
     }
 
+    val metadata: PlateMetadata = TODO()
+
     override val version = Version.from(annotation.version)
 
     /**
@@ -80,6 +82,8 @@ object PlateNamespace: PluginNamespace {
         field = null
         return value
     }
+
+    val loadedPlugins: Collection<PlatePlugin> get() = plugins.values.toList()
 
     override fun get(pluginId: String) = plugins[pluginId]
 
