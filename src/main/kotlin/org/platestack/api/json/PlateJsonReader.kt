@@ -22,9 +22,9 @@ import com.github.salomonbrys.kotson.string
 import com.google.gson.*
 import com.google.gson.internal.Streams
 import com.google.gson.stream.JsonReader
-import kotlinx.collections.immutable.ImmutableMap
 import org.platestack.api.message.Message
 import org.platestack.api.message.Sentence
+import org.platestack.api.structure.ImmutableMap
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 import java.io.Reader

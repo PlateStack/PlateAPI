@@ -18,9 +18,15 @@
 
 package org.platestack.api.structure
 
+import java.io.Serializable
+
 @JvmSynthetic fun <K, V, P> Map<K, P>.remap(function: (Map.Entry<K, P>) -> V) = RemappedMap(this, function)
 
-class RemappedMap<K, out V, out P>(private val parentMap: Map<K, P>, private val function: (Map.Entry<K, P>) -> V) : AbstractMap<K, V>() {
+class RemappedMap<K, out V, out P>(private val parentMap: Map<K, P>, private val function: (Map.Entry<K, P>) -> V) : AbstractMap<K, V>(), Serializable {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
+
     override val entries: Set<Map.Entry<K, V>> = object : AbstractSet<Map.Entry<K, V>>() {
         private val parentEntries = parentMap.entries
 

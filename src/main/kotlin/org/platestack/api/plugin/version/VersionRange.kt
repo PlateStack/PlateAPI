@@ -16,9 +16,9 @@
 
 package org.platestack.api.plugin.version
 
-import kotlinx.collections.immutable.ImmutableSet
-import kotlinx.collections.immutable.immutableHashSetOf
-import kotlinx.collections.immutable.toImmutableSet
+import org.platestack.api.structure.ImmutableSet
+import org.platestack.api.structure.immutableHashSetOf
+import org.platestack.api.structure.toImmutableSet
 
 /**
  * A selection of ranges which supports exclusions.

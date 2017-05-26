@@ -16,12 +16,17 @@
 
 package org.platestack.api.plugin
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import org.platestack.api.plugin.version.VersionRange
+import org.platestack.api.structure.ImmutableList
+import org.platestack.api.structure.toImmutableList
 
 data class Relation(val type: RelationType, val id: String, val namespace: String, val versions: ImmutableList<VersionRange>) {
     constructor(type: RelationType, id: String, namespace: String, versions: Iterable<VersionRange>): this(type, id, namespace, versions.toImmutableList())
+
+    init {
+        if(versions.isEmpty())
+            error("versions can't be empty.") //TODO Add support for empty version range
+    }
 
     companion object {
         @JvmStatic fun from(annotation: org.platestack.api.plugin.annotation.Relation) =

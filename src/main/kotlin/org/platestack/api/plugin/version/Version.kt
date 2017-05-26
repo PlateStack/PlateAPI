@@ -16,9 +16,10 @@
 
 package org.platestack.api.plugin.version
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.immutableListOf
-import kotlinx.collections.immutable.toImmutableList
+import org.platestack.api.structure.ImmutableList
+import org.platestack.api.structure.immutableListOf
+import org.platestack.api.structure.toImmutableList
+
 
 /**
  * A version following the [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html) rules.

@@ -21,12 +21,12 @@ import com.github.salomonbrys.kotson.jsonObject
 import com.github.salomonbrys.kotson.toJson
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.toImmutableHashMap
-import kotlinx.collections.immutable.toImmutableList
 import org.platestack.api.json.JsonText
 import org.platestack.api.message.Text
+import org.platestack.api.structure.ImmutableList
+import org.platestack.api.structure.ImmutableMap
+import org.platestack.api.structure.toImmutableHashMap
+import org.platestack.api.structure.toImmutableList
 import java.util.*
 
 interface DataTag {
