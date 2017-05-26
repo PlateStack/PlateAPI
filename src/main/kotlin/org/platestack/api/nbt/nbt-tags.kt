@@ -23,10 +23,10 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import org.platestack.api.json.JsonText
 import org.platestack.api.message.Text
-import org.platestack.api.structure.ImmutableList
-import org.platestack.api.structure.ImmutableMap
-import org.platestack.api.structure.toImmutableHashMap
-import org.platestack.api.structure.toImmutableList
+import org.platestack.structure.immutable.ImmutableList
+import org.platestack.structure.immutable.ImmutableMap
+import org.platestack.structure.immutable.toImmutableHashMap
+import org.platestack.structure.immutable.toImmutableList
 import java.util.*
 
 interface DataTag {

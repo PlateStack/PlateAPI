@@ -17,8 +17,8 @@
 package org.platestack.api.plugin
 
 import org.platestack.api.plugin.version.VersionRange
-import org.platestack.api.structure.ImmutableList
-import org.platestack.api.structure.toImmutableList
+import org.platestack.structure.immutable.ImmutableList
+import org.platestack.structure.immutable.toImmutableList
 
 data class Relation(val type: RelationType, val id: String, val namespace: String, val versions: ImmutableList<VersionRange>) {
     constructor(type: RelationType, id: String, namespace: String, versions: Iterable<VersionRange>): this(type, id, namespace, versions.toImmutableList())

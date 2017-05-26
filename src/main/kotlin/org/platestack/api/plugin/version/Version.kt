@@ -16,9 +16,9 @@
 
 package org.platestack.api.plugin.version
 
-import org.platestack.api.structure.ImmutableList
-import org.platestack.api.structure.immutableListOf
-import org.platestack.api.structure.toImmutableList
+import org.platestack.structure.immutable.ImmutableList
+import org.platestack.structure.immutable.immutableListOf
+import org.platestack.structure.immutable.toImmutableList
 
 
 /**

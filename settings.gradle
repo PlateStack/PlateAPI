@@ -14,15 +14,5 @@
  *  limitations under the License.
  */
 
-package org.platestack.api.structure
-
-import java.io.Serializable
-import java.util.*
-
-internal class ImmutableMirrorList<out E>(backend: List<E>)
-    : AbstractImmutableList<E>(), List<E> by Collections.unmodifiableList(backend), Serializable {
-    companion object {
-        private const val serialVersionUID = 1L
-    }
-}
-
+include ':plate-api:immutable-collections'
+project(':plate-api:immutable-collections').projectDir = file('immutable-collections')

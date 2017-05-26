@@ -24,7 +24,7 @@ import com.google.gson.internal.Streams
 import com.google.gson.stream.JsonReader
 import org.platestack.api.message.Message
 import org.platestack.api.message.Sentence
-import org.platestack.api.structure.ImmutableMap
+import org.platestack.structure.immutable.ImmutableMap
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 import java.io.Reader

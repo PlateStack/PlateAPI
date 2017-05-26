@@ -16,10 +16,10 @@
 
 package org.platestack.api.message
 
-import org.platestack.api.structure.ImmutableMap
-import org.platestack.api.structure.immutableMapOf
 import org.platestack.api.structure.remap
-import org.platestack.api.structure.toImmutableHashMap
+import org.platestack.structure.immutable.ImmutableMap
+import org.platestack.structure.immutable.immutableMapOf
+import org.platestack.structure.immutable.toImmutableHashMap
 import java.io.Serializable
 import java.math.BigDecimal
 import java.math.BigInteger

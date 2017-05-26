@@ -16,9 +16,9 @@
 
 package org.platestack.api.plugin.version
 
-import org.platestack.api.structure.ImmutableSet
-import org.platestack.api.structure.immutableHashSetOf
-import org.platestack.api.structure.toImmutableSet
+import org.platestack.structure.immutable.ImmutableSet
+import org.platestack.structure.immutable.immutableHashSetOf
+import org.platestack.structure.immutable.toImmutableSet
 
 /**
  * A selection of ranges which supports exclusions.

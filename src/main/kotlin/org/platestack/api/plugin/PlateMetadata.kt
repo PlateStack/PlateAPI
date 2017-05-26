@@ -18,8 +18,8 @@ package org.platestack.api.plugin
 
 import org.platestack.api.plugin.annotation.Plate
 import org.platestack.api.plugin.version.Version
-import org.platestack.api.structure.ImmutableSet
-import org.platestack.api.structure.toImmutableSet
+import org.platestack.structure.immutable.ImmutableSet
+import org.platestack.structure.immutable.toImmutableSet
 
 data class PlateMetadata(val id: String, val name: String, val version: Version, val relations: ImmutableSet<Relation>) {
     constructor(id: String, name: String, version: Version, relations: Iterable<Relation>): this(id, name, version, relations.toImmutableSet())
