@@ -43,10 +43,10 @@ class UniqueModification<V: Any> {
 
     private var field: V? = null
 
-    operator fun getValue(thisRef: Nothing?, property: KProperty<*>): V {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): V {
         return field ?: throw UninitializedPropertyAccessException("No value has been set to ${property.name} yet")
     }
-    operator fun setValue(thisRef: Nothing?, property: KProperty<*>, value: V) {
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: V) {
         if(field != null)
             error("The value can be modified only one time.")
 
