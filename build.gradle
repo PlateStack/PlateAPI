@@ -34,6 +34,7 @@ buildscript {
 }
 
 subprojects {
+    apply plugin: 'org.jetbrains.dokka'
     apply plugin: 'kotlin'
 
     repositories {
@@ -47,6 +48,26 @@ subprojects {
         testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
         testCompile 'junit:junit:4.12'
     }
+
+    task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
+        outputFormat = "javadoc"
+        outputDirectory = "$buildDir/javadoc"
+        linkMapping {
+            dir = "src/main/kotlin"
+            url = "https://github.com/PlateStack/immutable-collections/blob/v0.1.0-alpha/src/main/kotlin"
+            suffix = "#L"
+        }
+    }
+
+    dokka {
+        linkMapping {
+            dir = "src/main/kotlin"
+            url = "https://github.com/PlateStack/immutable-collections/blob/v0.1.0-alpha/src/main/kotlin"
+            suffix = "#L"
+        }
+    }
+
+    dokka.outputFormat = 'gfm'
 }
 
 apply plugin: 'kotlin'

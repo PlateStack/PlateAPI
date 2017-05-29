@@ -27,6 +27,7 @@ import org.platestack.api.server.PlateStack
 import org.platestack.api.server.PlatformNamespace
 import org.platestack.api.server.internal.InternalAccessor
 import java.io.File
+import java.io.IOException
 import java.lang.reflect.Modifier
 import java.net.URL
 import java.net.URLClassLoader
@@ -37,7 +38,6 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.jvm.jvmName
 
 /**
  * A plugin loaded by PlateStack
@@ -45,16 +45,11 @@ import kotlin.reflect.jvm.jvmName
 abstract class PlatePlugin: Plugin {
     override val namespace: PlateNamespace get() = PlateNamespace
 
-    /**
-     * The [Plate] annotation which was decorating the class
-     */
-    val annotation = checkNotNull(PlateNamespace.loadingPlugin) {
+    val metadata = checkNotNull(PlateNamespace.loadingPlugin) {
         "Attempted to create a new PlatePlugin instance in a invalid state!"
     }
 
-    val metadata: PlateMetadata = TODO()
-
-    override val version = Version.from(annotation.version)
+    override val version get() = metadata.version
 
     /**
      * A logger to be used exclusively by this plugin
@@ -77,7 +72,7 @@ object PlateNamespace: PluginNamespace {
     /**
      * A plugin which is being loaded right now
      */
-    internal var loadingPlugin: Plate? = null ; get() {
+    internal var loadingPlugin: PlateMetadata? = null ; get() {
         val value = field
         field = null
         return value
@@ -100,9 +95,9 @@ object PlateNamespace: PluginNamespace {
 
     private val plateDescriptor = Type.getDescriptor(Plate::class.java)
     private object Abort: Throwable()
-    fun load(file: URL): Collection<PlatePlugin> {
-        println("PlateDescriptor: $plateDescriptor\n")
 
+    @Throws(IOException::class)
+    private fun scan(file: URL): Collection<String> {
         val classesToLoad = ArrayDeque<String>()
         file.openStream().use { JarInputStream(it).use { input ->
             input.forEachEntry { entry ->
@@ -142,40 +137,74 @@ object PlateNamespace: PluginNamespace {
             }
         } }
 
-        if(classesToLoad.isEmpty())
-            return emptyList()
+        return classesToLoad
+    }
 
-        println("\n\nClasses to load: $classesToLoad")
-        val loader = PluginClassLoader(file, javaClass.classLoader)
-        val loadedClasses = classesToLoad.map { loader.loadClass(it).kotlin }
+    private data class LoadingClass(val file: URL, val name: String, val classLoader: PluginClassLoader, var kClass: KClass<out PlatePlugin>, var metadata: PlateMetadata)
 
-        println("\n\nLoaded classes: $loadedClasses")
+    private fun loadClasses(file: URL, classNames: Collection<String>): Map<String, LoadingClass?> {
+        if(classNames.isEmpty())
+            return emptyMap()
+
         val pluginClass = PlatePlugin::class
-        return loadedClasses.associate {
-            it to it.findAnnotation<Plate>()
-        }.mapNotNull { (`class`, annotation) ->
-            if(annotation == null) {
-                println("The class $`class` is not contains @Plate annotation and will not be loaded!")
-                null
-            }
-            else if(`class`.isSubclassOf(pluginClass)) {
-                println("Loading ${annotation.name} ${annotation.version} -- $`class`")
-                @Suppress("UNCHECKED_CAST")
-                synchronized(this) {
-                    try {
-                        loadingPlugin = annotation
-                        getOrCreateInstance(`class` as KClass<out PlatePlugin>)
-                    } finally {
-                        loadingPlugin = null
-                    }
+        val loader = PluginClassLoader(file, javaClass.classLoader)
+        return classNames.asSequence()
+                .map {
+                    println("Loading the class $it from $file")
+                    it to loader.loadClass(it).kotlin
                 }
-            }
-            else {
-                println("The class $`class` does not extends ${pluginClass.jvmName} and will not be loaded!")
-                null
+                .map { (name, `class`) ->
+
+                    if(`class`.isSubclassOf(pluginClass)) {
+                        val annotation = `class`.findAnnotation<Plate>()
+                        if(annotation == null) {
+                            println("The class $`class` is not contains @Plate annotation and will not be loaded!")
+                            name to null
+                        }
+                        else {
+                            @Suppress("UNCHECKED_CAST")
+                            name to LoadingClass(file, name, loader, `class` as KClass<out PlatePlugin>, PlateMetadata(annotation))
+                        }
+                    }
+                    else {
+                        println("The class $`class` does not extends ${pluginClass.simpleName} and will not be loaded!")
+                        name to null
+                    }
+
+                }
+                .toMap()
+    }
+
+    fun load(files: Set<URL>): List<PlatePlugin> {
+        val loadingClasses = files.asSequence()
+                .map { it to scan(it) }
+                .map { (url, classes) -> loadClasses(url, classes) }
+                .flatMap { it.asSequence() }
+                .map { (name, loading) -> name to loading }
+                .toMap()
+
+        val loadingPlugins = loadingClasses.asSequence()
+                .mapNotNull { it.value }
+                .associate { it.metadata.id to it }
+
+        val order = PlateStack.internal.resolveOrder(loadingClasses.values.mapNotNull { it?.metadata })
+
+        return order.map {
+            val data = loadingPlugins[it.id] ?: error("Could not find the plugin data for ${it.id}.\n\nOrder: $order\n\nLoading plugins: $loadingPlugin\n\nLoading classes: $loadingClasses\n\nURLs: $files")
+            println("Loading ${it.name} ${it.version} -- #${it.id} ${data.kClass}")
+            synchronized(this) {
+                try {
+                    loadingPlugin = it
+                    getOrCreateInstance(data.kClass)
+                }
+                finally {
+                    loadingPlugin = null
+                }
             }
         }
     }
+
+    fun load(vararg files: URL) = load(files.toSet())
 }
 
 class PluginClassLoader(url: URL, parent: ClassLoader): URLClassLoader(arrayOf(url), parent)
@@ -185,12 +214,15 @@ fun main(args: Array<String>) {
         override val platformName = "test"
         override lateinit var translator: Translator
         override val platform = PlatformNamespace("test" to Version(0,1,0,"SNAPSHOT"))
+        @Suppress("OverridingDeprecatedMember")
         override val internal = object : InternalAccessor {
             override fun toJson(text: Text): JsonObject {
                 TODO("not implemented")
             }
+
+            override fun resolveOrder(metadata: Collection<PlateMetadata>) = metadata.toList()
         }
     }
 
-    PlateNamespace.load(File("D:\\_InteliJ\\PlateStack\\ExamplePlugin\\build\\libs\\ExamplePlugin-0.1.0-SNAPSHOT.jar").toURI().toURL())
+    PlateNamespace.load(File("D:\\_InteliJ\\CleanDishes\\001 Simple Hello World\\Java\\build\\libs\\001 Simple Hello World - Java-0.1.0-SNAPSHOT.jar").toURI().toURL())
 }

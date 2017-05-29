@@ -21,6 +21,7 @@ import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
 import org.platestack.api.message.Text
 import org.platestack.api.minecraft.item.ItemStack
+import org.platestack.api.plugin.PlateMetadata
 import org.platestack.api.plugin.PlatePlugin
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -44,4 +45,6 @@ interface InternalAccessor {
 
     @Deprecated("Will be renamed soon")
     fun toJson(text: Text): JsonObject
+
+    fun resolveOrder(metadata: Collection<PlateMetadata>): List<PlateMetadata>
 }
