@@ -16,16 +16,8 @@
 
 package org.platestack.api.plugin
 
-import com.google.gson.JsonObject
-import org.platestack.api.message.Text
-import org.platestack.api.message.Translator
-import org.platestack.api.plugin.version.Version
-import org.platestack.api.server.PlateServer
 import org.platestack.api.server.PlateStack
-import org.platestack.api.server.PlatformNamespace
 import org.platestack.api.server.UniqueModification
-import org.platestack.api.server.internal.InternalAccessor
-import java.io.File
 import java.net.URL
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
@@ -50,6 +42,16 @@ abstract class PlatePlugin: Plugin {
 }
 
 abstract class PlateLoader {
+    init {
+        try {
+            PlateNamespace.loader
+            error("A plate plugin loader has already been installed and ${javaClass.name} can't be instantiated now.")
+        }
+        catch (ignored: UninitializedPropertyAccessException) {
+            // Allowed
+        }
+    }
+
     /**
      * A plugin which is being loaded right now
      */
@@ -93,22 +95,4 @@ object PlateNamespace: PluginNamespace {
     val loadedPlugins: Collection<PlatePlugin> get() = plugins.values.toList()
 
     override fun get(pluginId: String) = plugins[pluginId]
-}
-
-fun main(args: Array<String>) {
-    PlateStack = object : PlateServer{
-        override val platformName = "test"
-        override lateinit var translator: Translator
-        override val platform = PlatformNamespace("test" to Version(0,1,0,"SNAPSHOT"))
-        @Suppress("OverridingDeprecatedMember")
-        override val internal = object : InternalAccessor {
-            override fun toJson(text: Text): JsonObject {
-                TODO("not implemented")
-            }
-
-            override fun resolveOrder(metadata: Collection<PlateMetadata>) = metadata.toList()
-        }
-    }
-
-    PlateNamespace.loader.load(File("D:\\_InteliJ\\CleanDishes\\001 Simple Hello World\\Java\\build\\libs\\001 Simple Hello World - Java-0.1.0-SNAPSHOT.jar").toURI().toURL())
 }
