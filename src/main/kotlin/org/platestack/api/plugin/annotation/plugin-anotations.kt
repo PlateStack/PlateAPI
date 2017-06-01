@@ -83,7 +83,7 @@ annotation class Relation(val type: RelationType, val id: ID, vararg val version
 /**
  * A selection of version which may have exclusions.
  *
- * @property min The minimum inclusive version which matches this range. Default is 0.0.0
+ * @property min The minimum inclusive version which matches this range. Default is 0.0.0, which means any version before [max]
  * @property max The maximum inclusive version which matches this range.
  *
  * If this is lower then [min] then it will be ignored and all versions after [min] will be included.
