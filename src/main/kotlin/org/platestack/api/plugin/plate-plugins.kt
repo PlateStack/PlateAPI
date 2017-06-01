@@ -16,11 +16,16 @@
 
 package org.platestack.api.plugin
 
+import org.platestack.api.plugin.exception.PluginLoadingException
 import org.platestack.api.server.PlateStack
 import org.platestack.api.server.UniqueModification
+import java.lang.reflect.Modifier
 import java.net.URL
 import kotlin.reflect.KClass
+import kotlin.reflect.full.cast
 import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.isSuperclassOf
+import kotlin.reflect.jvm.jvmName
 
 /**
  * A plugin loaded by PlateStack
@@ -52,6 +57,8 @@ abstract class PlateLoader {
         }
     }
 
+    private val loadingLock = Any()
+
     /**
      * A plugin which is being loaded right now
      */
@@ -61,13 +68,69 @@ abstract class PlateLoader {
         return value
     }
 
-    protected fun <T: PlatePlugin> getOrCreateInstance(metadata: PlateMetadata, `class`: KClass<T>): T {
-        synchronized(this) {
+    @Throws(ClassNotFoundException::class)
+    protected fun ClassLoader.loadPluginClass(metadata: PlateMetadata, className: String): KClass<out PlatePlugin> {
+        synchronized(loadingLock) {
+            val kClass: KClass<*>
             try {
-                println("Loading ${metadata.name} ${metadata.version} -- #${metadata.id} $`class`")
+                println("Pre-loading ${metadata.name} ${metadata.version} -- #${metadata.id} $className")
                 loadingPlugin = metadata
-                `class`.objectInstance?.apply { return this }
-                return `class`.createInstance()
+                kClass = loadClass(className).kotlin
+            }
+            catch (e: ClassNotFoundException) {
+                throw PluginLoadingException(cause = e)
+            }
+            finally {
+                loadingPlugin = null
+            }
+
+            if(!PlatePlugin::class.isSuperclassOf(kClass)) {
+                throw ClassNotFoundException("The class ${kClass.jvmName} defines a @Plate annotation but does not extends the PlatePlugin class!")
+            }
+
+            @Suppress("UNCHECKED_CAST")
+            return kClass as KClass<out PlatePlugin>
+        }
+    }
+
+    private val <T: PlatePlugin> KClass<T>.scalaModule: T? get()  {
+        try { java.getDeclaredField("MODULE$") } catch (e: NoSuchFieldException) { return null }.let {
+            val access = it.modifiers
+            if (Modifier.isPublic(access) && Modifier.isStatic(access) && it.type.name == jvmName && PlatePlugin::class.isSuperclassOf(it.type.kotlin)) {
+                return cast(it.get(null))
+            }
+        }
+        return null
+    }
+
+    private val <T: PlatePlugin> KClass<T>.groovySingleton: T? get() {
+        val java = java
+        try{ java.getDeclaredMethod("getInstance") } catch (e: NoSuchMethodException) { return null }.let {
+            val access = it.modifiers
+            if(it.returnType == java && it.exceptionTypes.isEmpty() && Modifier.isPublic(access) && Modifier.isStatic(access)) {
+                return cast(it.invoke(null))
+            }
+        }
+        return null
+    }
+
+    protected fun <T: PlatePlugin> getOrCreateInstance(metadata: PlateMetadata, kClass: KClass<T>): T {
+        synchronized(loadingLock) {
+            try {
+                println("Loading ${metadata.name} ${metadata.version} -- #${metadata.id} $kClass")
+                loadingPlugin = metadata
+
+                // Kotlin object
+                kClass.objectInstance?.apply { return this }
+
+                // Scala module
+                kClass.scalaModule?.apply { return this }
+
+                // Groovy / Java singleton by static getInstance() method
+                kClass.groovySingleton?.apply { return this }
+
+                // Public constructor without parameters
+                return kClass.createInstance()
             }
             finally {
                 loadingPlugin = null
