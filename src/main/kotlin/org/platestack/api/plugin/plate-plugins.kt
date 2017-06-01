@@ -96,7 +96,7 @@ abstract class PlateLoader {
     private val <T: PlatePlugin> KClass<T>.scalaModule: T? get()  {
         try { java.getDeclaredField("MODULE$") } catch (e: NoSuchFieldException) { return null }.let {
             val access = it.modifiers
-            if (Modifier.isPublic(access) && Modifier.isStatic(access) && it.type.name == jvmName && PlatePlugin::class.isSuperclassOf(it.type.kotlin)) {
+            if (Modifier.isPublic(access) && Modifier.isStatic(access) && it.type.name == jvmName && isSuperclassOf(it.type.kotlin)) {
                 return cast(it.get(null))
             }
         }
