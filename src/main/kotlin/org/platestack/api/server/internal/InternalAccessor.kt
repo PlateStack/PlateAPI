@@ -19,12 +19,12 @@ package org.platestack.api.server.internal
 import com.github.salomonbrys.kotson.jsonObject
 import com.github.salomonbrys.kotson.set
 import com.google.gson.JsonObject
+import mu.KLogger
+import mu.KotlinLogging
 import org.platestack.api.message.Text
 import org.platestack.api.minecraft.item.ItemStack
 import org.platestack.api.plugin.PlateMetadata
 import org.platestack.api.plugin.PlatePlugin
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 interface InternalAccessor {
     fun createShowItemJSON(stack: ItemStack): JsonObject {
@@ -41,7 +41,7 @@ interface InternalAccessor {
         return json
     }
 
-    fun createLogger(plugin: PlatePlugin): Logger = LoggerFactory.getLogger(plugin.javaClass)
+    fun createLogger(plugin: PlatePlugin): KLogger = KotlinLogging.logger(plugin.javaClass.name)
 
     @Deprecated("Will be renamed soon")
     fun toJson(text: Text): JsonObject

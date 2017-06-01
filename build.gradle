@@ -84,7 +84,7 @@ dependencies {
     compile project(':plate-api:immutable-collections')
 
     compile 'com.github.salomonbrys.kotson:kotson:2.5.0'
-    compile 'org.slf4j:slf4j-api:1.7.25'
+    compile 'io.github.microutils:kotlin-logging:1.4.4'
 
     compile 'org.ow2.asm:asm:5.2'
 
