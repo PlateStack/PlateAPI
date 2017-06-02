@@ -54,10 +54,10 @@ annotation class Library(val group: String, val artifact: String, val version: S
 /**
  * Indicates that a PlatePlugin depends on the specified external libraries
  *
- * @property libraries The libraries that are required by the plugin
+ * @property value The libraries that are required by the plugin
  */
 @Retention @Target(AnnotationTarget.CLASS) @MustBeDocumented
-annotation class Requires(vararg val libraries: Library)
+annotation class Requires(vararg val value: Library)
 
 /**
  * A version following the [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html) rules.
