@@ -49,12 +49,15 @@ abstract class PlatePlugin: Plugin {
     /**
      * Method called when the plugin is fully ready to load
      */
-    open internal fun onEnable() {}
+    open protected fun onEnable() {}
 
     /**
      * Method called when the plugin is being disable, no more activities will be allowed after this method returns
      */
-    open internal fun onDisable() {}
+    open protected fun onDisable() {}
+
+    @JvmSynthetic internal fun enable() = onEnable()
+    @JvmSynthetic internal fun disable() = onEnable()
 }
 
 abstract class PlateLoader {
@@ -157,7 +160,7 @@ abstract class PlateLoader {
 
             try {
                 PlateNamespace.plugins[plugin.metadata.id] = plugin
-                plugin.onEnable()
+                plugin.enable()
             }
             catch (e: Exception) {
                 PlateNamespace.plugins -= plugin.metadata.id
@@ -172,7 +175,7 @@ abstract class PlateLoader {
                 error("The plugin ${plugin.metadata.id} is not loaded!")
 
             try {
-                plugin.onDisable()
+                plugin.disable()
             }
             catch (e: Exception) {
                 throw PluginLoadingException(cause = e)
