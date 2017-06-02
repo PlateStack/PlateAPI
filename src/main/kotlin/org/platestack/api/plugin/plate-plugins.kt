@@ -19,6 +19,7 @@ package org.platestack.api.plugin
 import org.platestack.api.plugin.exception.PluginLoadingException
 import org.platestack.api.server.PlateStack
 import org.platestack.api.server.UniqueModification
+import org.platestack.structure.immutable.ImmutableList
 import java.lang.reflect.Modifier
 import java.net.URL
 import kotlin.reflect.KClass
@@ -44,6 +45,16 @@ abstract class PlatePlugin: Plugin {
      */
     @Suppress("LeakingThis")
     protected val logger = PlateStack.internal.createLogger(this)
+
+    /**
+     * Method called when the plugin is fully ready to load
+     */
+    open internal fun onEnable() {}
+
+    /**
+     * Method called when the plugin is being disable, no more activities will be allowed after this method returns
+     */
+    open internal fun onDisable() {}
 }
 
 abstract class PlateLoader {
@@ -58,6 +69,7 @@ abstract class PlateLoader {
     }
 
     private val loadingLock = Any()
+    abstract val loadingOrder: ImmutableList<String>
 
     /**
      * A plugin which is being loaded right now
@@ -138,6 +150,39 @@ abstract class PlateLoader {
         }
     }
 
+    protected fun enable(plugin: PlatePlugin) {
+        synchronized(loadingLock) {
+            if (plugin.metadata.id in PlateNamespace.plugins)
+                error("The plugin ${plugin.metadata.id} is already loaded!")
+
+            try {
+                PlateNamespace.plugins[plugin.metadata.id] = plugin
+                plugin.onEnable()
+            }
+            catch (e: Exception) {
+                PlateNamespace.plugins -= plugin.metadata.id
+                throw PluginLoadingException(cause = e)
+            }
+        }
+    }
+
+    protected fun disable(plugin: PlatePlugin) {
+        synchronized(loadingLock) {
+            if (plugin.metadata.id !in PlateNamespace.plugins)
+                error("The plugin ${plugin.metadata.id} is not loaded!")
+
+            try {
+                plugin.onDisable()
+            }
+            catch (e: Exception) {
+                throw PluginLoadingException(cause = e)
+            }
+            finally {
+                PlateNamespace.plugins -= plugin.metadata.id
+            }
+        }
+    }
+
     abstract fun load(files: Set<URL>): List<PlatePlugin>
     fun load(vararg files: URL) = load(files.toSet())
 }
@@ -153,7 +198,7 @@ object PlateNamespace: PluginNamespace {
     /**
      * All loaded plugins
      */
-    private val plugins = hashMapOf<String, PlatePlugin>()
+    internal val plugins = hashMapOf<String, PlatePlugin>()
 
     val loadedPlugins: Collection<PlatePlugin> get() = plugins.values.toList()
 

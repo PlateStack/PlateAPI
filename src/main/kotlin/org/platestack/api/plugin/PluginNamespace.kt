@@ -29,4 +29,9 @@ interface PluginNamespace {
      * Gets a plugin that is registered in this namespace
      */
     operator fun get(pluginId: String): Plugin?
+
+    /**
+     * Checks if a plugin is registered in this namespace
+     */
+    operator fun contains(pluginId: String) = get(pluginId) != null
 }
