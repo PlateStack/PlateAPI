@@ -46,6 +46,20 @@ import org.platestack.api.server.PlateStack
 annotation class Plate(val id: String, val name: String, val version: Version, vararg val relations: Relation = emptyArray())
 
 /**
+ * A maven coordinate
+ */
+@Retention @Target @MustBeDocumented
+annotation class Library(val group: String, val artifact: String, val version: String)
+
+/**
+ * Indicates that a PlatePlugin depends on the specified external libraries
+ *
+ * @property libraries The libraries that are required by the plugin
+ */
+@Retention @Target(AnnotationTarget.CLASS) @MustBeDocumented
+annotation class Requires(vararg val libraries: Library)
+
+/**
  * A version following the [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html) rules.
  *
  * Examples from simplest to full versions:
