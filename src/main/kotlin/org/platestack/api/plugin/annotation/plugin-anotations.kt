@@ -41,23 +41,48 @@ import org.platestack.api.server.PlateStack
  *
  * @property relations All relations that this plugin has with other plugins, may also declare
  * relations to platform plugins or mods and to platform and Minecraft versions.
+ *
+ * @property groovy The Groovy version required by this plugin. Leave empty if it does not uses Groovy.
+ * This will automatically add a groovy-all dependency to [requires] will be provided at runtime.
+ *
+ * @property scala The Scala version required by this plugin. Leave empty if it does not uses Scala.
+ * This will automatically add a scala-library dependency to [requires] will be provided at runtime.
+ *
+ * @property kotlin The Kotlin version required by this plugin. Leave empty if it does not uses Scala.
+ * This will automatically add a kotlin-stdlib dependency to [requires],
+ * however the specified version will not be provided at runtime as all plate plugins depends on the plate api and it
+ * depends on Kotlin itself, the specified version will be used to warn the server owners on logs if the plugin requires
+ * a different Kotlin version then the provided version, which could result in incompatibility and errors.
+ *
+ * @property jdk The minimum JDK version required by this plugin. The default is "1.8" which stands to Java 8.
+ *
+ * @property requires Maven libraries which are required by this plugin, they will be automatically provided to the
+ * plugin at runtime as long as it is available on Maven Center, JCenter or a custom maven repository preconfigured
+ * by the server owner. **Transitive dependencies will NOT be included automatically at this time!**, so if you library
+ * depends on another library you are required to add the other library manually for now.
+ *
+ * If This plugin depends on an other plugin which happens to depend on the same library as yours but in a different version,
+ * the other plugin will take priority and PlateStack will provides you with a different version then the requested.
+ * A warning will also be logged to notify the server owner that errors may happens due to the usage of incompatible library versions.
+ *
+ * If this plugin happens to be on the same JAR file as an other plugin which requires the same library but in a different version,
+ * the highest version will be provided. All the libraries required by the other plugin will also be provided as the
+ * provisioning is done on JAR level.
  */
 @Retention @Target(AnnotationTarget.CLASS) @MustBeDocumented
-annotation class Plate(val id: String, val name: String, val version: Version, vararg val relations: Relation = emptyArray())
+annotation class Plate(val id: String, val name: String, val version: Version, vararg val relations: Relation = emptyArray(),
+                       val groovy: String = "", val scala: String = "", val kotlin: String = "", val jdk: String = "1.8",
+                       val requires: Array<Library> = emptyArray())
 
 /**
- * A maven coordinate
+ * A maven coordinate.
+ *
+ * @property group The maven group
+ * @property artifact The artifact inside the [group]
+ * @property version The artifact version
  */
 @Retention @Target @MustBeDocumented
 annotation class Library(val group: String, val artifact: String, val version: String)
-
-/**
- * Indicates that a PlatePlugin depends on the specified external libraries
- *
- * @property value The libraries that are required by the plugin
- */
-@Retention @Target(AnnotationTarget.CLASS) @MustBeDocumented
-annotation class Requires(vararg val value: Library)
 
 /**
  * A version following the [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html) rules.
