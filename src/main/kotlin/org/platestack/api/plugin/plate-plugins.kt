@@ -16,10 +16,12 @@
 
 package org.platestack.api.plugin
 
+import mu.KLogger
 import org.platestack.api.plugin.exception.PluginLoadingException
 import org.platestack.api.server.PlateStack
 import org.platestack.api.server.UniqueModification
 import org.platestack.structure.immutable.ImmutableList
+import java.io.IOException
 import java.lang.reflect.Modifier
 import java.net.URL
 import kotlin.reflect.KClass
@@ -60,7 +62,7 @@ abstract class PlatePlugin: Plugin {
     @JvmSynthetic internal fun disable() = onEnable()
 }
 
-abstract class PlateLoader {
+abstract class PlateLoader(protected val logger: KLogger) {
     init {
         try {
             PlateNamespace.loader
@@ -73,6 +75,20 @@ abstract class PlateLoader {
 
     private val loadingLock = Any()
     abstract val loadingOrder: ImmutableList<String>
+
+    open protected fun setAPI(metadata: PlateMetadata) {
+        synchronized(loadingLock) {
+            try {
+                loadingPlugin = metadata
+                PlateNamespace.api = object : PlatePlugin(){}
+            }
+            finally {
+                loadingPlugin = null
+            }
+
+            logger.info { "The PlateStack API has been set to ${metadata.version} and depends on the following libraries:\n - ${metadata.libraries.joinToString("\n - ")}" }
+        }
+    }
 
     /**
      * A plugin which is being loaded right now
@@ -88,7 +104,7 @@ abstract class PlateLoader {
         synchronized(loadingLock) {
             val kClass: KClass<*>
             try {
-                println("Pre-loading ${metadata.name} ${metadata.version} -- #${metadata.id} $className")
+                logger.info { "Pre-loading ${metadata.name} ${metadata.version} -- #${metadata.id} $className" }
                 loadingPlugin = metadata
                 kClass = loadClass(className).kotlin
             }
@@ -132,7 +148,7 @@ abstract class PlateLoader {
     protected fun <T: PlatePlugin> getOrCreateInstance(metadata: PlateMetadata, kClass: KClass<T>): T {
         synchronized(loadingLock) {
             try {
-                println("Loading ${metadata.name} ${metadata.version} -- #${metadata.id} $kClass")
+                logger.info { "Loading ${metadata.name} ${metadata.version} -- #${metadata.id} $kClass" }
                 loadingPlugin = metadata
 
                 // Kotlin object
@@ -158,6 +174,7 @@ abstract class PlateLoader {
             if (plugin.metadata.id in PlateNamespace.plugins)
                 error("The plugin ${plugin.metadata.id} is already loaded!")
 
+            logger.info { "Enabling ${plugin.metadata.name} ${plugin.metadata.version} -- #${plugin.metadata.id}" }
             try {
                 PlateNamespace.plugins[plugin.metadata.id] = plugin
                 plugin.enable()
@@ -174,6 +191,7 @@ abstract class PlateLoader {
             if (plugin.metadata.id !in PlateNamespace.plugins)
                 error("The plugin ${plugin.metadata.id} is not loaded!")
 
+            logger.info { "Disabling ${plugin.metadata.name} ${plugin.metadata.version} -- #${plugin.metadata.id}" }
             try {
                 plugin.disable()
             }
@@ -186,7 +204,12 @@ abstract class PlateLoader {
         }
     }
 
+    @Throws(IOException::class)
+    abstract fun scan(file: URL): Map<String, PlateMetadata>
+
+    @Throws(PluginLoadingException::class)
     abstract fun load(files: Set<URL>): List<PlatePlugin>
+
     fun load(vararg files: URL) = load(files.toSet())
 }
 
@@ -195,6 +218,7 @@ abstract class PlateLoader {
  */
 object PlateNamespace: PluginNamespace {
     var loader by UniqueModification<PlateLoader>()
+    var api by UniqueModification<PlatePlugin>()
 
     override val id: String get() = "plate"
 

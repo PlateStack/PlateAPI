@@ -46,7 +46,7 @@ import org.platestack.api.server.PlateStack
  * This will automatically add a groovy-all dependency to [requires] will be provided at runtime.
  *
  * @property scala The Scala version required by this plugin. Leave empty if it does not uses Scala.
- * This will automatically add a scala-library dependency to [requires] will be provided at runtime.
+ * This will automatically add a scala-library-all dependency to [requires] will be provided at runtime.
  *
  * @property kotlin The Kotlin version required by this plugin. Leave empty if it does not uses Scala.
  * This will automatically add a kotlin-stdlib dependency to [requires],
@@ -69,7 +69,7 @@ import org.platestack.api.server.PlateStack
  * the highest version will be provided. All the libraries required by the other plugin will also be provided as the
  * provisioning is done on JAR level.
  */
-@Retention @Target(AnnotationTarget.CLASS) @MustBeDocumented
+@Retention(AnnotationRetention.BINARY) @Target(AnnotationTarget.CLASS) @MustBeDocumented
 annotation class Plate(val id: String, val name: String, val version: Version, vararg val relations: Relation = emptyArray(),
                        val groovy: String = "", val scala: String = "", val kotlin: String = "", val jdk: String = "1.8",
                        val requires: Array<Library> = emptyArray())

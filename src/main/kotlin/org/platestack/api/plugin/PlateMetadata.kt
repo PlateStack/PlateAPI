@@ -16,12 +16,14 @@
 
 package org.platestack.api.plugin
 
-import org.platestack.api.plugin.annotation.Plate
+import org.platestack.api.plugin.version.MavenArtifact
 import org.platestack.api.plugin.version.Version
 import org.platestack.structure.immutable.ImmutableSet
 import org.platestack.structure.immutable.toImmutableSet
 
-data class PlateMetadata(val id: String, val name: String, val version: Version, val relations: ImmutableSet<Relation>) {
-    constructor(id: String, name: String, version: Version, relations: Iterable<Relation>): this(id, name, version, relations.toImmutableSet())
-    constructor(annotation: Plate): this(annotation.id, annotation.name, Version.from(annotation.version), annotation.relations.map { Relation.from(it) })
+data class PlateMetadata(val id: String, val name: String, val version: Version, val jdk: String,
+                         val relations: ImmutableSet<Relation>, val libraries: ImmutableSet<MavenArtifact>
+) {
+    constructor(id: String, name: String, version: Version, jdk: String, relations: Iterable<Relation>, libraries: Iterable<MavenArtifact> = emptyList())
+            : this(id, name, version, jdk, relations.toImmutableSet(), libraries.toImmutableSet())
 }

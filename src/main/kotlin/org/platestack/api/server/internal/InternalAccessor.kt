@@ -23,7 +23,6 @@ import mu.KLogger
 import mu.KotlinLogging
 import org.platestack.api.message.Text
 import org.platestack.api.minecraft.item.ItemStack
-import org.platestack.api.plugin.PlateMetadata
 import org.platestack.api.plugin.PlatePlugin
 
 interface InternalAccessor {
@@ -43,8 +42,6 @@ interface InternalAccessor {
 
     fun createLogger(plugin: PlatePlugin): KLogger = KotlinLogging.logger(plugin.javaClass.name)
 
-    @Deprecated("Will be renamed soon")
+    @Deprecated("Will be renamed soon™")
     fun toJson(text: Text): JsonObject
-
-    fun resolveOrder(metadata: Collection<PlateMetadata>): List<PlateMetadata>
 }

@@ -1,0 +1,6 @@
+org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2-4
+org.jetbrains.kotlin:kotlin-reflect:1.1.2-4
+#org.platestack:plate-api:0.1.0
+com.github.salomonbrys.kotson:kotson:2.5.0
+io.github.microutils:kotlin-logging:1.4.4
+org.ow2.asm:asm:5.2
