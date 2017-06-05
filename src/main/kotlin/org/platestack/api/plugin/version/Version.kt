@@ -165,9 +165,13 @@ data class Version(
         private val VALID_METADATA = Regex("^[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*$")
 
         private val FIRST_NUMBERS = Regex("^([0-9]+)(?:\\.([0-9]+))*")
-        private val LABEL_PART = Regex("^-?([^0-9a-zA-Z._-]+)?\\+?(.*)?$")
+        private val LABEL_PART = Regex("^-?([0-9a-zA-Z._-]+)?\\+?(.*)?$")
         private val MULTI_DOT = Regex("\\.{2,}")
         private val FIX_ZERO = Regex("^0+")
+        private val REMOVE_INVALID_CHARS = Regex("[^0-9A-Za-z.-]")
+        private val REMOVE_EMPTY = Regex("\\.+")
+        private val REMOVE_EMPTY_START = Regex("^\\.")
+        private val REMOVE_EMPTY_END = Regex("^\\.")
 
         /**
          * Checks if a string only contains digits
@@ -189,6 +193,7 @@ data class Version(
          * Parses a string into the closest SemVersion definition as possible
          */
         @JvmStatic fun parse(version: String): Version {
+            println("Parsing version: $version")
             var carret = 0
             val numbers = FIRST_NUMBERS.find(version)?.value?.let {
                 carret += it.length
@@ -200,10 +205,11 @@ data class Version(
             val pat = numbers.getOrNull(2)?.toInt() ?: 0
 
             val label = mutableListOf<String>()
-            numbers.listIterator(3).forEach { label += it }
+            if(numbers.size > 3)
+                numbers.listIterator(3).forEach { label += it }
 
             var unstable = numbers.isEmpty()
-            val build = LABEL_PART.find(version.substring(carret))?.groupValues?.let {
+            var build = LABEL_PART.find(version.substring(carret))?.groupValues?.let {
                 val definedLabel = it[1]
                 if(definedLabel.isNotBlank()) {
                     unstable = true
@@ -223,6 +229,11 @@ data class Version(
                         iter.set(replaced)
                 }
             }
+
+            build = build.replace(REMOVE_INVALID_CHARS, "")
+                    .replace(REMOVE_EMPTY, ".")
+                    .replace(REMOVE_EMPTY_START, "")
+                    .replace(REMOVE_EMPTY_END, "")
 
             return Version(maj, min, pat, label.toImmutableList(), build, version, !unstable && maj > 0)
         }

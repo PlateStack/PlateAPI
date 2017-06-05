@@ -13,27 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+@file:JvmName("Minecraft")
 
 package org.platestack.api.minecraft
 
-object Minecraft : MinecraftServer by Minecraft.internalServer {
-    /**
-     * The current implementation, it's private to protect it from modification after the first value is set.
-     */
-    private lateinit var internalServer: MinecraftServer
+import org.platestack.api.server.UniqueModification
 
-    /**
-     * The server implementation object. Cannot be modified after a value is set.
-     */
-    @JvmStatic var server = internalServer ; set(value) {
-        val internal: MinecraftServer
-        try {
-            internal = internalServer
-        } catch (e: IllegalStateException) {
-            internalServer = value
-            return
-        }
-
-        error("Minecraft is already being driven by $internal")
-    }
-}
+var Minecraft by UniqueModification<MinecraftServer>()
+    @JvmName("getServer") get
+    @JvmName("setServer") set

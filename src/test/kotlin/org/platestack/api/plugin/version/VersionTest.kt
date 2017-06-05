@@ -26,6 +26,37 @@ import org.junit.runner.RunWith
 
 @RunWith(JUnitPlatform::class)
 class VersionTest: Spek({
+    given("String 1.11.2-R0.1-SNAPSHOT") {
+        val string = "1.11.2-R0.1-SNAPSHOT"
+        on("parse") {
+            val parse = Version.parse(string)
+            it("should create a version instance like: Version(1,11,2,\"R0\",\"1-SNAPSHOT\"") {
+                assertTrue(Version(1,11,2,"R0","1-SNAPSHOT").sameAs(parse))
+            }
+        }
+    }
+
+    given("String git-Bukkit-6e3cec8 (MC: 1.11.2)") {
+        val string = "git-Bukkit-6e3cec8 (MC: 1.11.2)"
+        on("parse") {
+            val parse = Version.parse(string)
+            it("should have major, minor and patch = 0") {
+                assertEquals(0, parse.major)
+                assertEquals(0, parse.minor)
+                assertEquals(0, parse.patch)
+            }
+            it("should have a single label git-Bukkit-6e3cec8") {
+                assertEquals(listOf("git-Bukkit-6e3cec8"), parse.label)
+            }
+            it("should have metadata MC1.11.2") {
+                assertEquals("MC1.11.2", parse.metadata)
+            }
+            it("should still print as git-Bukkit-6e3cec8 (MC: 1.11.2)") {
+                assertEquals("git-Bukkit-6e3cec8 (MC: 1.11.2)", parse.toString())
+            }
+        }
+    }
+
     given("Version 1.2.3-0.a.b.c.33.d-e-f+00.g.h.i--j-l") {
         val version = Version(1,2,3,"0","a","b","c","33","d-e-f", metadata = "00.g.h.i--j-l")
         on("toString") {
