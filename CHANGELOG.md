@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+- Java, Kotlin, Groovy, Scala and Ceylon plugin support
+- Maven dependency support
 - Plugin API
 - Version API
 - NBT API
