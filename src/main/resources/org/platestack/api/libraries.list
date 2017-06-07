@@ -3,4 +3,3 @@ org.jetbrains.kotlin:kotlin-reflect:1.1.2-4
 org.slf4j:slf4j-api:1.7.25
 com.github.salomonbrys.kotson:kotson:2.5.0
 io.github.microutils:kotlin-logging:1.4.4
-org.ow2.asm:asm:5.2
