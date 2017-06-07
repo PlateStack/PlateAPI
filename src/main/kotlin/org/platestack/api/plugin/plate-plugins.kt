@@ -20,6 +20,7 @@ import mu.KLogger
 import org.platestack.api.plugin.exception.PluginLoadingException
 import org.platestack.api.server.PlateStack
 import org.platestack.api.server.UniqueModification
+import org.platestack.api.structure.ReflectionTarget
 import org.platestack.structure.immutable.ImmutableList
 import java.io.IOException
 import java.lang.reflect.Modifier
@@ -33,7 +34,7 @@ import kotlin.reflect.jvm.jvmName
 /**
  * A plugin loaded by PlateStack
  */
-abstract class PlatePlugin: Plugin {
+abstract class PlatePlugin @ReflectionTarget constructor(): Plugin {
     override val namespace: PlateNamespace get() = PlateNamespace
 
     val metadata = checkNotNull(PlateNamespace.loader.loadingPlugin) {
