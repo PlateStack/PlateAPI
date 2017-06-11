@@ -17,7 +17,7 @@
 
 package org.platestack.api.server
 
-import kotlin.reflect.KProperty
+import org.platestack.util.UniqueModification
 
 /**
  * An identification pattern which must be followed in all PlateStack's API which requires ID registration.
@@ -39,17 +39,3 @@ var PlateStack by UniqueModification<PlateServer>()
     @JvmName("getServer") get
     @JvmName("setServer") set
 
-class UniqueModification<V: Any> {
-
-    private var field: V? = null
-
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): V {
-        return field ?: throw UninitializedPropertyAccessException("No value has been set to ${property.name} yet")
-    }
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: V) {
-        if(field != null)
-            error("The value can be modified only one time.")
-
-        this.field = value
-    }
-}

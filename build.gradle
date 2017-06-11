@@ -83,11 +83,32 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    compile project(':plate-api:immutable-collections')
+configurations {
+    compileUtil
+    util {
+        extendsFrom compileUtil
+    }
 
+    compile.extendsFrom util
+}
+
+sourceSets {
+    util {
+        java.srcDirs = []
+        kotlin.srcDirs = ['src/util/kotlin']
+        resources.srcDirs = ['src/util/resources']
+        compileClasspath = configurations.compileUtil
+    }
+}
+
+dependencies {
+    compileUtil "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    compileUtil "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    compileUtil project(':plate-api:immutable-collections')
+
+    util sourceSets.util.output
+
+    compile sourceSets.util.output
     compile 'com.github.salomonbrys.kotson:kotson:2.5.0'
     compile 'org.slf4j:slf4j-api:1.7.25'
     compile 'io.github.microutils:kotlin-logging:1.4.4'

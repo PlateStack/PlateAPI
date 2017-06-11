@@ -13,12 +13,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-@file:JvmName("Minecraft")
 
-package org.platestack.api.minecraft
+package org.platestack.util
 
-import org.platestack.util.UniqueModification
+import kotlin.reflect.KProperty
 
-var Minecraft by UniqueModification<MinecraftServer>()
-    @JvmName("getServer") get
-    @JvmName("setServer") set
+class UniqueModification<V: Any> {
+
+    private var field: V? = null
+
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): V {
+        return field ?: throw UninitializedPropertyAccessException("No value has been set to ${property.name} yet")
+    }
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: V) {
+        if(field != null)
+            error("The value can be modified only one time.")
+
+        this.field = value
+    }
+}
