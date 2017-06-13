@@ -19,6 +19,8 @@ package org.platestack.util
 
 import kotlin.reflect.KClass
 
+inline fun <T> T?.orElse(task: () -> T) = this ?: task()
+
 inline fun <R> tryOrNull(task: () -> R): R? {
     try {
         return task()
