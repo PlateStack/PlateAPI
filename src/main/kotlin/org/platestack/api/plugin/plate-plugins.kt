@@ -19,8 +19,8 @@ package org.platestack.api.plugin
 import mu.KLogger
 import org.platestack.api.plugin.exception.PluginLoadingException
 import org.platestack.api.server.PlateStack
-import org.platestack.api.structure.ReflectionTarget
 import org.platestack.structure.immutable.ImmutableList
+import org.platestack.util.ReflectionTarget
 import org.platestack.util.UniqueModification
 import java.io.IOException
 import java.lang.reflect.Modifier

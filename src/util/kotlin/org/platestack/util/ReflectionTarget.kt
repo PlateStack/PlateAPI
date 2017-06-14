@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.platestack.api.structure
+package org.platestack.util
 
 import kotlin.reflect.KClass
 
