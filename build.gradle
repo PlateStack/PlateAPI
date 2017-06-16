@@ -126,6 +126,16 @@ jar {
     }
 }
 
+task jarUtil(type: Jar, dependsOn: ':utilClasses') {
+    classifier = 'util'
+    from(sourceSets.util.output)
+}
+
+task jarUtilSources(type:Jar){
+    from sourceSets.main.allSource
+    classifier = 'util-sources'
+}
+
 junitPlatform {
     filters {
         engines {
@@ -152,7 +162,11 @@ task jarSources(type:Jar){
     classifier = 'sources'
 }
 
-artifacts { archives jarSources }
+artifacts {
+    archives jarSources
+    archives jarUtil
+    archives jarUtilSources
+}
 
 compileKotlin {
     kotlinOptions {
