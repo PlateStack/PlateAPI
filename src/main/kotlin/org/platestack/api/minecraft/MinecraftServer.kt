@@ -20,4 +20,5 @@ import org.platestack.api.plugin.version.Version
 
 interface MinecraftServer {
     val version: Version
+    val instance: Any
 }
