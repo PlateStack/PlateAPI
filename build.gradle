@@ -121,19 +121,10 @@ dependencies {
 }
 
 jar {
+    from sourceSets.util.output
     from {
         ["CHANGELOG.md", "LICENSE.txt"]
     }
-}
-
-task jarUtil(type: Jar, dependsOn: ':utilClasses') {
-    classifier = 'util'
-    from(sourceSets.util.output)
-}
-
-task jarUtilSources(type:Jar){
-    from sourceSets.main.allSource
-    classifier = 'util-sources'
 }
 
 junitPlatform {
@@ -164,8 +155,6 @@ task jarSources(type:Jar){
 
 artifacts {
     archives jarSources
-    archives jarUtil
-    archives jarUtilSources
 }
 
 compileKotlin {
