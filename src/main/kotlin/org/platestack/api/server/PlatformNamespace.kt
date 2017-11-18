@@ -16,11 +16,12 @@
 
 package org.platestack.api.server
 
+import org.platestack.api.cmd.CommandRegistry
 import org.platestack.api.plugin.Plugin
 import org.platestack.api.plugin.PluginNamespace
 import org.platestack.api.plugin.version.Version
 
-class PlatformNamespace(vararg entries: Pair<String, Version>): PluginNamespace {
+class PlatformNamespace(override val commandRegistry: CommandRegistry, vararg entries: Pair<String, Version>): PluginNamespace {
     inner class Platform(override val version: Version): Plugin {
         override val namespace: PluginNamespace get() = this@PlatformNamespace
     }

@@ -16,6 +16,7 @@
 
 package org.platestack.api.server
 
+import org.platestack.api.cmd.CommandRegistry
 import org.platestack.api.message.Translator
 import org.platestack.api.plugin.PlateNamespace
 import org.platestack.api.plugin.Plugin
@@ -50,6 +51,8 @@ interface PlateServer {
     val platform: PluginNamespace
 
     val minecraft: Plugin get() = checkNotNull(platform["minecraft"]) { "The Minecraft platform is missing!" }
+
+    val commandRegistry: CommandRegistry
 
     /**
      * Gets a registered namespace by its value

@@ -30,6 +30,10 @@ data class Message(val sentence: Sentence, val parameterValues: ImmutableMap<Str
 
     constructor(rawText: String): this(Sentence(rawText), immutableMapOf())
 
+    constructor(rawText: String, parameters: ImmutableMap<String, ParameterValue>) : this(Sentence(rawText), parameters)
+
+    constructor(rawText: String, parameters: Map<String, Serializable>): this(Sentence(rawText), parameters)
+
     val parameters: Map<String, Serializable> = parameterValues.remap { it.value.value }
 
     fun copy(sentence: Sentence = this.sentence, parameters: Map<String, Serializable> = this.parameters) = Message(sentence, parameters)

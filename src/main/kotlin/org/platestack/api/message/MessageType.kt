@@ -14,28 +14,8 @@
  *  limitations under the License.
  */
 
-package org.platestack.api.plugin
+package org.platestack.api.message
 
-import org.platestack.api.cmd.CommandRegistry
-
-/**
- * Manages plugins from it's namespace
- */
-interface PluginNamespace {
-    /**
-     * An unique ID across all the savers.
-     */
-    val id: String
-
-    val commandRegistry: CommandRegistry
-
-    /**
-     * Gets a plugin that is registered in this namespace
-     */
-    operator fun get(pluginId: String): Plugin?
-
-    /**
-     * Checks if a plugin is registered in this namespace
-     */
-    operator fun contains(pluginId: String) = get(pluginId) != null
+enum class MessageType {
+    CHAT, SYSTEM, ACTION
 }

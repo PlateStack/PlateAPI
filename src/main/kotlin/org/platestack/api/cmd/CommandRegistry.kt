@@ -14,28 +14,12 @@
  *  limitations under the License.
  */
 
-package org.platestack.api.plugin
+package org.platestack.api.cmd
 
-import org.platestack.api.cmd.CommandRegistry
+import org.platestack.api.plugin.PlatePlugin
 
-/**
- * Manages plugins from it's namespace
- */
-interface PluginNamespace {
-    /**
-     * An unique ID across all the savers.
-     */
-    val id: String
+abstract class CommandRegistry {
+    abstract fun execute(call: CommandCall): CommandResult
 
-    val commandRegistry: CommandRegistry
-
-    /**
-     * Gets a plugin that is registered in this namespace
-     */
-    operator fun get(pluginId: String): Plugin?
-
-    /**
-     * Checks if a plugin is registered in this namespace
-     */
-    operator fun contains(pluginId: String) = get(pluginId) != null
+    abstract internal fun register(plugin: PlatePlugin, definition: CommandDefinition)
 }

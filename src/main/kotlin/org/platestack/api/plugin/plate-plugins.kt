@@ -17,6 +17,7 @@
 package org.platestack.api.plugin
 
 import mu.KLogger
+import org.platestack.api.cmd.*
 import org.platestack.api.plugin.exception.PluginLoadingException
 import org.platestack.api.server.PlateStack
 import org.platestack.structure.immutable.ImmutableList
@@ -61,6 +62,10 @@ abstract class PlatePlugin @ReflectionTarget constructor(): Plugin {
 
     @JvmSynthetic internal fun enable() = onEnable()
     @JvmSynthetic internal fun disable() = onEnable()
+
+    fun registerCommand(id: String, function: CommandFunction) {
+
+    }
 }
 
 abstract class PlateLoader(protected val logger: KLogger) {
@@ -231,4 +236,19 @@ object PlateNamespace: PluginNamespace {
     val loadedPlugins: Collection<PlatePlugin> get() = plugins.values.toList()
 
     override fun get(pluginId: String) = plugins[pluginId]
+
+    override val commandRegistry: CommandRegistry get() = PlateCommandRegistry
+}
+
+internal object PlateCommandRegistry: CommandRegistry() {
+    private val pluginCommands = mutableMapOf<String, Set<String>>()
+    //private val commands =
+
+    override fun execute(call: CommandCall): CommandResult {
+        TODO("not implemented")
+    }
+
+    override fun register(plugin: PlatePlugin, definition: CommandDefinition) {
+        TODO("not implemented")
+    }
 }

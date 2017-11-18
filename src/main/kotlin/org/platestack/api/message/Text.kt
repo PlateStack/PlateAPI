@@ -36,7 +36,7 @@ sealed class Text(
         val style: Style,
         val hoverEvent: HoverEvent?,
         val clickEvent: ClickEvent?,
-        val insertion: String?,
+        val insertion: Message?,
         vararg extra: Text
 ): Serializable {
     /**
@@ -116,7 +116,7 @@ sealed class Text(
             style: Style,
             hoverEvent: HoverEvent?,
             clickEvent: ClickEvent?,
-            insertion: String? = null,
+            insertion: Message? = null,
             vararg extra: Text
     ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
 
@@ -126,14 +126,14 @@ sealed class Text(
          * @param insertion See [Text.insertion]
          * @param extra See [Text.extra]
          */
-        constructor(style: Style, insertion: String?, vararg extra: Text) : this(style, null, null, insertion, *extra)
+        constructor(style: Style, insertion: Message?, vararg extra: Text) : this(style, null, null, insertion, *extra)
 
         /**
          * Creates a compound without events
          * @param style See [Text.style]
          * @param extra See [Text.extra]
          */
-        constructor(style: Style, vararg extra: Text) : this(style, null, null, "", *extra)
+        constructor(style: Style, vararg extra: Text) : this(style, null, null, null, *extra)
     }
 
     /**
@@ -152,7 +152,7 @@ sealed class Text(
             val text: String, style: Style = Style.EMPTY,
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
-            insertion: String? = null,
+            insertion: Message? = null,
             vararg extra: Text
     ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
 
@@ -198,7 +198,7 @@ sealed class Text(
             style: Style = Style.EMPTY,
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
-            insertion: String? = null,
+            insertion: Message? = null,
             val with: List<Text> = emptyList(),
             vararg extra: Text
     ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
@@ -247,7 +247,7 @@ sealed class Text(
             style: Style = Style.EMPTY,
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
-            insertion: String? = null,
+            insertion: Message? = null,
             vararg extra: Text
     ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
         override fun equals(other: Any?): Boolean {
@@ -309,7 +309,7 @@ sealed class Text(
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
             val value: Message? = null,
-            insertion: String? = null,
+            insertion: Message? = null,
             vararg extra: Text
     ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
 
@@ -331,7 +331,7 @@ sealed class Text(
                 hoverEvent: HoverEvent? = null,
                 clickEvent: ClickEvent? = null,
                 value: String? = null,
-                insertion: String? = null,
+                insertion: Message? = null,
                 vararg extra: Text
         ) : this(Message(name), Message(objective), style, hoverEvent, clickEvent, value?.let { Message(it) }, insertion, *extra)
 
@@ -388,7 +388,7 @@ sealed class Text(
             style: Style = Style.EMPTY,
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
-            insertion: String? = null,
+            insertion: Message? = null,
             vararg extra: Text
     ) : Text(style, hoverEvent, clickEvent, insertion, *extra) {
 
@@ -404,7 +404,7 @@ sealed class Text(
                                   style: Style = Style.EMPTY,
                                   hoverEvent: HoverEvent? = null,
                                   clickEvent: ClickEvent? = null,
-                                  insertion: String? = null,
+                                  insertion: Message? = null,
                                   vararg extra: Text
         ) : this(Message(selector), style, hoverEvent, clickEvent, insertion, *extra)
 
@@ -436,7 +436,7 @@ sealed class Text(
             style: Style = Style.EMPTY,
             hoverEvent: HoverEvent? = null,
             clickEvent: ClickEvent? = null,
-            insertion: String? = null,
+            insertion: Message? = null,
             vararg extra: Text
     ): Text(style, hoverEvent, clickEvent, insertion, *extra) {
 
@@ -446,7 +446,7 @@ sealed class Text(
                 parameters: Map<String, Serializable> = emptyMap(),
                 hoverEvent: HoverEvent? = null,
                 clickEvent: ClickEvent? = null,
-                insertion: String? = null,
+                insertion: Message? = null,
                 vararg extra: Text
         ): this(Message(sentence, parameters), style, hoverEvent, clickEvent, insertion, *extra)
 
@@ -455,7 +455,7 @@ sealed class Text(
                 style: Style = Style.EMPTY,
                 hoverEvent: HoverEvent? = null,
                 clickEvent: ClickEvent? = null,
-                insertion: String? = null,
+                insertion: Message? = null,
                 vararg extra: Text
         ): this(Message(rawText), style, hoverEvent, clickEvent, insertion, *extra)
     }

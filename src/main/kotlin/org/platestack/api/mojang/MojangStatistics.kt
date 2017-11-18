@@ -14,28 +14,11 @@
  *  limitations under the License.
  */
 
-package org.platestack.api.plugin
+package org.platestack.api.mojang
 
-import org.platestack.api.cmd.CommandRegistry
-
-/**
- * Manages plugins from it's namespace
- */
-interface PluginNamespace {
-    /**
-     * An unique ID across all the savers.
-     */
-    val id: String
-
-    val commandRegistry: CommandRegistry
-
-    /**
-     * Gets a plugin that is registered in this namespace
-     */
-    operator fun get(pluginId: String): Plugin?
-
-    /**
-     * Checks if a plugin is registered in this namespace
-     */
-    operator fun contains(pluginId: String) = get(pluginId) != null
+enum class MojangStatistics(val key: String) {
+    MINECRAFT_SOLD("item_minecraft_sold"),
+    PREPAID_MINECRAFT_REDEEMED("prepaid_card_redeemed_minecraft"),
+    COBALT_SOLD("item_sold_cobalt"),
+    SCROLLS_SOLD("item_sold_scrolls")
 }

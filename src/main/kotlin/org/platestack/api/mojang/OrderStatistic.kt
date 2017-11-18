@@ -14,28 +14,10 @@
  *  limitations under the License.
  */
 
-package org.platestack.api.plugin
+package org.platestack.api.mojang
 
-import org.platestack.api.cmd.CommandRegistry
-
-/**
- * Manages plugins from it's namespace
- */
-interface PluginNamespace {
-    /**
-     * An unique ID across all the savers.
-     */
-    val id: String
-
-    val commandRegistry: CommandRegistry
-
-    /**
-     * Gets a plugin that is registered in this namespace
-     */
-    operator fun get(pluginId: String): Plugin?
-
-    /**
-     * Checks if a plugin is registered in this namespace
-     */
-    operator fun contains(pluginId: String) = get(pluginId) != null
-}
+data class OrderStatistic(
+        val total: Int,
+        val last24h: Int,
+        val salesPerSecond: Int
+)
